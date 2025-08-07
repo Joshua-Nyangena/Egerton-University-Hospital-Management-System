@@ -1,0 +1,270 @@
+<div th:fragment="content" class="hospital-ui">
+
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+
+    <h3 class="title" th:text="${getAll} ? 'All Patient Queue' : 'Pending and Triaged Queue'">Patient Queue</h3>
+
+    <!-- Search Form -->
+    <!-- All Patients Queue Search -->
+    <div th:if="${getAll}">
+        <form id="allSearchForm" method="get" th:action="@{/doctor/searchAllPatientsQueue}" class="search-form">
+            <input type="text" name="keyword" placeholder="Search all by name or Reg No" th:value="${keyword}">
+            <button type="submit">Search</button>
+            <a th:href="@{/doctor/allPatientsQueue}" class="btn btn-secondary" id="allClearButton">Clear</a>
+        </form>
+    </div>
+
+    <!-- Pending & Triaged Queue Search -->
+    <div th:unless="${getAll}">
+        <form id="pendingSearchForm" method="get" th:action="@{/doctor/searchPendingTriagedQueue}" class="search-form">
+            <input type="text" name="keyword" placeholder="Search pending by name or Reg No" th:value="${keyword}">
+            <button type="submit">Search</button>
+            <a th:href="@{/doctor/pendingTriagedQueue}" class="btn btn-secondary" id="pendingClearButton">Clear</a>
+        </form>
+    </div>
+
+    <table class="patients-table" id="queueTable">
+        <thead>
+            <tr>
+                <th>Queue ID</th>
+                <th>Name</th>
+                <th>Age</th>
+                <th>Reg No</th>
+                <th>Contact</th>
+                <th>Specification</th>
+                <th>Date & Time</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="queue : ${queueList}">
+                <td th:text="${queue.queueId}"></td>
+                <td th:text="${queue.patient.name}"></td>
+                <td th:text="${queue.patient.getAge()}"></td>
+                <td th:text="${queue.patient.regNo}"></td>
+                <td th:text="${queue.patient.contact}"></td>
+                <td th:text="${queue.specification}"></td>
+                <td th:text="${queue.date}"></td>
+                <td th:text="${queue.status}"></td>
+                <td class="action-buttons">
+                    <a th:href="@{/doctor/labTest/{queueId}(queueId=${queue.queueId})}" class="btn btn-primary" onclick="loadContent(this.href, event)">Lab Test</a>
+                    <a th:href="@{/doctor/prescription/{queueId}(queueId=${queue.queueId})}" class="btn btn-primary" onclick="loadContent(this.href, event)">Prescription</a>
+                    <a th:href="@{/doctor/view/{queueId}(queueId=${queue.queueId})}" class="btn btn-secondary">View Triage</a>
+                    <a th:href="@{/doctor/viewMedicalHistory/{patientId}(patientId=${queue.patient.id})}" class="btn btn-secondary" onclick="loadContent(this.href, event)">View Medical History</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="navigation-links">
+        <a th:href="@{/logout}" class="nav-link logout">Logout</a>
+    </div>
+
+    <style>
+        /* Main Container Styles */
+        .hospital-ui {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            font-family: 'Roboto', 'Segoe UI', sans-serif;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Logo Container */
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-container img {
+                max-width: 80px;
+                height: auto;
+            }
+
+
+        /* Title */
+        .title {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 600;
+            margin: 0;
+            padding-bottom: 5px;
+            border-bottom: 2px solid #3498db;
+            margin-bottom: 20px;
+        }
+
+        /* Search Form */
+        .search-form {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .search-form input[type="text"] {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 50%;
+            font-size: 14px;
+        }
+
+        .search-form button,
+        .search-form .btn-secondary {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .search-form button {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .search-form button:hover {
+            background-color: #2980b9;
+        }
+
+        .search-form .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+            text-decoration: none;
+        }
+
+        .search-form .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        /* Patients Table */
+        .patients-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .patients-table thead {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .patients-table th {
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .patients-table tbody tr {
+            border-bottom: 1px solid #f1f1f1;
+            transition: background-color 0.2s ease;
+        }
+
+        .patients-table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .patients-table td {
+            padding: 12px 15px;
+            font-size: 14px;
+            color: #444;
+        }
+
+        .patients-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .action-buttons .btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background-color: #2ecc71;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-secondary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #2980b9;
+        }
+
+        /* Navigation Links */
+        .navigation-links {
+            text-align: center;
+            margin-top: 25px;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+            margin: 0 10px;
+        }
+
+        .nav-link.logout {
+            color: #e74c3c;
+        }
+
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .search-form {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .search-form input[type="text"] {
+                width: 100%;
+            }
+
+            .search-form button,
+            .search-form .btn-secondary {
+                width: 100%;
+            }
+
+            .patients-table {
+                display: block;
+                overflow-x: auto;
+            }
+        }
+    </style>
+
+</div>

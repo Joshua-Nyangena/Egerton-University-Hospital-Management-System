@@ -1,0 +1,124 @@
+<div th:fragment="content" class="container">  
+
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+    <h1>Edit Staff</h1>
+
+    
+    
+    <form id="editStaffForm" method="post" th:action="@{/admin/updateStaff}" th:object="${staff}" onsubmit="submitForm('editStaffForm');">
+        <input type="hidden" th:field="*{id}">
+
+        <div class="form-group">
+            <label>Name:</label>
+            <input type="text" id="name" th:field="*{name}" required>
+            <span class="error-message" id="nameError" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+        </div>
+
+        <div class="form-group">
+            <label>National Id Number:</label>
+            <input type="text" id="nationalId" th:field="*{nationalId}" required>
+            <span class="error-message" id="nationalIdError" th:if="${#fields.hasErrors('nationalId')}" th:errors="*{nationalId}"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Contact:</label>
+            <input type="text" id="contact" th:field="*{contact}" required>
+            <span class="error-message" id="contactError" th:if="${#fields.hasErrors('contact')}" th:errors="*{contact}"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Personal Email:</label>
+            <input type="email" id="personalEmail" th:field="*{personalEmail}" required>
+            <span class="error-message" id="personalEmailError" th:if="${#fields.hasErrors('personalEmail')}" th:errors="*{personalEmail}"></span>
+        </div>
+
+        <div class="form-group">
+            <label>Work Email:</label>
+            <input type="email" id="workEmail" th:field="*{workEmail}" readonly>
+        </div>
+
+        <div class="form-group">
+            <label for="role">Role:</label>
+            <select id="role" name="role" th:field="*{role}">
+                <option value="ADMIN">Admin</option>
+                <option value="DOCTOR">Doctor</option>
+                <option value="RECEPTIONIST">Receptionist</option>
+                <option value="LAB_TECHNICIAN">Lab Technician</option>
+                <option value="PHARMACIST">Pharmacist</option>
+                <option value="TRIAGE_OFFICER">Triage Officer</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn-primary">Update</button>
+    </form>
+
+    
+    <script>
+        
+    </script>
+    <p th:if="${success}" th:text="${success}" style="color: green; text-align: center;"></p>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .logo-container img {
+                max-width: 80px;
+                height: auto;
+            }
+        label {
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .error-message {
+            color: red;
+            font-size: 14px;
+        }
+        #alertBox {
+            display: none;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            text-align: center;
+            border-radius: 5px;
+        }
+    </style>
+</div>

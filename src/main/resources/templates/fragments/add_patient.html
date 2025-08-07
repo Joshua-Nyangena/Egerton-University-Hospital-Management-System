@@ -1,0 +1,280 @@
+<div th:fragment="content" class="container">
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+        <style>
+            .error-message {
+                color: red;
+                font-size: 14px;
+                margin-top: 5px;
+            }
+            
+            .form-control.is-invalid {
+                border-color: #dc3545;
+                padding-right: calc(1.5em + 0.75rem);
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right calc(0.375em + 0.1875rem) center;
+                background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+            }
+            
+            .logo-container {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            
+            .logo-container img {
+                max-width: 80px;
+                height: auto;
+            }
+            
+            .form-container {
+                max-width: 650px;
+                margin: 0 auto;
+                padding: 20px;
+                box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                border-radius: 8px;
+                background-color: #f9f9f9;
+            }
+            
+            h2 {
+                margin-bottom: 30px;
+            }
+            
+            .client-error {
+                display: none;
+            }
+        </style>
+    </head>
+
+    <div class="form-container">
+        <h2 class="text-center text-primary">Register Patient</h2>
+        <div class="logo-container">
+            <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+        </div>
+
+        <form id="addPatientForm" th:action="@{/admin/savePatient}" method="post" th:object="${patient}">
+            <div class="mb-3">
+                <label for="name" class="form-label">Full Name</label>
+                <input type="text" id="name" name="name" class="form-control" required 
+                       th:value="*{name}" th:class="${#fields.hasErrors('name')} ? 'form-control is-invalid' : 'form-control'">
+                <span id="nameError" class="error-message client-error"></span>
+                <span class="error-message" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+                <small class="form-text text-muted">Enter patient's full name (first and last name).</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="regNo" class="form-label">Registration Number</label>
+                <input type="text" id="regNo" name="regNo" class="form-control" required 
+                       placeholder="S13/04346/21" th:value="*{regNo}" 
+                       th:class="${#fields.hasErrors('regNo')} ? 'form-control is-invalid' : 'form-control'">
+                <span id="regNoError" class="error-message client-error"></span>
+                <span class="error-message" th:if="${#fields.hasErrors('regNo')}" th:errors="*{regNo}"></span>
+                <small class="form-text text-muted">Format: S13/04346/21</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="contact" class="form-label">Phone Number</label>
+                <input type="tel" id="contact" name="contact" class="form-control" required 
+                       th:value="*{contact}" th:class="${#fields.hasErrors('contact')} ? 'form-control is-invalid' : 'form-control'">
+                <span id="contactError" class="error-message client-error"></span>
+                <span class="error-message" th:if="${#fields.hasErrors('contact')}" th:errors="*{contact}"></span>
+                <small class="form-text text-muted">International format (e.g., +254712345678)</small>
+            </div>
+
+            <div class="mb-3">
+                <label for="dob" class="form-label">Date of Birth</label>
+                <input type="date" id="dob" name="dob" class="form-control" required th:value="*{dob}" 
+                       th:class="${#fields.hasErrors('dob')} ? 'form-control is-invalid' : 'form-control'">
+                <span id="dobError" class="error-message client-error"></span>
+                <span class="error-message" th:if="${#fields.hasErrors('dob')}" th:errors="*{dob}"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Age</label>
+                <input type="text" id="age" class="form-control" readonly>
+                <small class="form-text text-muted">Auto-calculated from date of birth</small>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Register Patient</button>
+        </form>
+
+        <div class="mt-3">
+            <p th:if="${success}" th:text="${success}" class="text-success text-center"></p>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize international phone input
+            let phoneInput = document.querySelector("#contact");
+            let iti = window.intlTelInput(phoneInput, {
+                preferredCountries: ["ke", "ug", "tz", "rw"],
+                initialCountry: "ke",
+                separateDialCode: true,
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+            });
+
+            // Set today as the maximum date for DOB
+            let today = new Date();
+            let dd = String(today.getDate()).padStart(2, '0');
+            let mm = String(today.getMonth() + 1).padStart(2, '0');
+            let yyyy = today.getFullYear();
+            today = yyyy + '-' + mm + '-' + dd;
+            document.getElementById("dob").max = today;
+
+            // Pre-set the contact field if it has a value
+            if ($("#contact").val()) {
+                iti.setNumber($("#contact").val());
+            }
+
+            // Real-time validation functions
+            function validateName() {
+                let name = $("#name").val().trim();
+                let nameRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+                
+                if (name === "") {
+                    showError("name", "Name is required.");
+                    return false;
+                } else if (name.length < 2) {
+                    showError("name", "Name must be at least 2 characters.");
+                    return false;
+                } else if (name.length > 100) {
+                    showError("name", "Name must be less than 100 characters.");
+                    return false;
+                } else if (!nameRegex.test(name)) {
+                    showError("name", "Name must contain only letters, spaces, and simple punctuation.");
+                    return false;
+                } else {
+                    hideError("name");
+                    return true;
+                }
+            }
+            
+            function validateRegNo() {
+                let regNo = $("#regNo").val().trim();
+                let regNoRegex = /^[A-Z][0-9]{2}\/[0-9]{5}\/[0-9]{2}$/;
+                
+                if (regNo === "") {
+                    showError("regNo", "Registration number is required.");
+                    return false;
+                } else if (!regNoRegex.test(regNo)) {
+                    showError("regNo", "Registration number must be in format 'S13/04346/21'.");
+                    return false;
+                } else {
+                    hideError("regNo");
+                    return true;
+                }
+            }
+            
+            function validatePhone() {
+                if (iti.getNumber() === "") {
+                    showError("contact", "Phone number is required.");
+                    return false;
+                } else if (!iti.isValidNumber()) {
+                    showError("contact", "Invalid phone number. Use international format.");
+                    return false;
+                } else {
+                    hideError("contact");
+                    return true;
+                }
+            }
+            
+            function validateDob() {
+                let dob = $("#dob").val();
+                if (dob === "") {
+                    showError("dob", "Date of birth is required.");
+                    return false;
+                } else {
+                    let dobDate = new Date(dob);
+                    let today = new Date();
+                    if (dobDate > today) {
+                        showError("dob", "Date of birth cannot be in the future.");
+                        return false;
+                    } else {
+                        let age = calculateAge(dobDate);
+                        if (age > 120) {
+                            showError("dob", "Age cannot exceed 120 years.");
+                            return false;
+                        } else {
+                            hideError("dob");
+                            $("#age").val(age);
+                            return true;
+                        }
+                    }
+                }
+            }
+            
+            // Helper functions
+            function showError(field, message) {
+                $("#" + field + "Error").text(message).show().removeClass("client-error");
+                $("#" + field).addClass("is-invalid");
+            }
+            
+            function hideError(field) {
+                $("#" + field + "Error").addClass("client-error").hide();
+                $("#" + field).removeClass("is-invalid");
+                
+                // Hide server-side errors too if they exist
+                $(`[th\\:errors*='${field}']`).hide();
+            }
+            
+            function calculateAge(dobDate) {
+                let today = new Date();
+                let age = today.getFullYear() - dobDate.getFullYear();
+                let monthDiff = today.getMonth() - dobDate.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dobDate.getDate())) {
+                    age--;
+                }
+                return age;
+            }
+            
+            // Real-time validation events
+            $("#name").on("input blur", validateName);
+            $("#regNo").on("input blur", validateRegNo);
+            $("#contact").on("input blur", validatePhone);
+            $("#dob").on("change blur", validateDob);
+            
+            // Auto-calculate age when DOB is selected
+            $("#dob").change(function () {
+                let dobDate = new Date($(this).val());
+                let today = new Date();
+                if (dobDate <= today) {
+                    let age = calculateAge(dobDate);
+                    if (age >= 0 && age <= 120) {
+                        $("#age").val(age);
+                    } else {
+                        $("#age").val("");
+                    }
+                }
+            });
+            
+            // Calculate initial age if DOB is already set
+            if ($("#dob").val()) {
+                let dobDate = new Date($("#dob").val());
+                let age = calculateAge(dobDate);
+                if (age >= 0 && age <= 120) {
+                    $("#age").val(age);
+                }
+            }
+            
+            // Form submission with client-side validation
+            $("#addPatientForm").submit(function (event) {
+                // Validate all fields
+                let isNameValid = validateName();
+                let isRegNoValid = validateRegNo();
+                let isPhoneValid = validatePhone();
+                let isDobValid = validateDob();
+                
+                if (!(isNameValid && isRegNoValid && isPhoneValid && isDobValid)) {
+                    event.preventDefault(); // Prevent form submission if any validation fails
+                } else {
+                    // Set the full international number before submitting
+                    $("#contact").val(iti.getNumber());
+                }
+            });
+        });
+    </script>
+</div>

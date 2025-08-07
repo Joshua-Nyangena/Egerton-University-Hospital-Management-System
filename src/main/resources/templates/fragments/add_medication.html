@@ -1,0 +1,108 @@
+<div th:fragment="content" class="container">
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+    <h2>➕ Add New Medication</h2>
+
+    <form id="addMedicationForm" th:action="@{/medication/saveMedication}" method="post">
+        <div class="form-group">
+            <label for="name">Medication Name:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+
+        <div class="form-group">
+            <label for="quantity">Quantity:</label>
+            <input type="number" id="quantity" name="quantity" required>
+        </div>
+
+        <div class="form-group">
+            <label for="supplier">Supplier:</label>
+            <input type="text" id="supplier" name="supplier" required>
+        </div>
+
+        <button type="submit" class="btn-primary">Add Medication</button>
+    </form>
+
+    <div class="navigation-links">
+        <a href="#" class="nav-link" data-url="/medication/inventory">Back to Inventory</a>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $("#addPatientForm").submit(function(event) {
+                event.preventDefault();
+
+                $.ajax({
+                    type: "POST",
+                    url: "/medication/saveMedication",
+                    data: $(this).serialize(),
+                    success: function() {
+                        alert("Medication added successfully!");
+                        $("#content").load("/medication/inventory");
+                    },
+                    error: function() {
+                        alert("Error adding medication.");
+                    }
+                });
+            });
+        });
+    </script>
+
+    <style>
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .logo-container img {
+        width: 100px;
+        height: auto;
+    }
+        label {
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .navigation-links {
+            text-align: center;
+            margin-top: 10px;
+        }
+        .nav-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</div>

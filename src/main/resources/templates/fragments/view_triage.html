@@ -1,0 +1,75 @@
+<div th:fragment="content">
+    <head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            width: 60%;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+        .header img {
+            height: 50px;
+        }
+        h2 {
+            color: #333;
+        }
+        p {
+            font-size: 18px;
+            color: #555;
+            margin: 10px 0;
+        }
+        strong {
+            color: #222;
+        }
+        a {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+        </div>
+        <h2>Patient Triage Information</h2>
+        <p><strong>Temperature:</strong> <span th:text="${triage.temperature}"></span> °C</p>
+        <p><strong>Pulse Rate:</strong> <span th:text="${triage.pulseRate}"></span> bpm</p>
+        <p><strong>Blood Pressure:</strong> <span th:text="${triage.bloodPressure}"></span> mmHg</p>
+        <p><strong>Weight:</strong> <span th:text="${triage.weight}"></span> kg</p>
+        <p><strong>Height:</strong> <span th:text="${triage.height}"></span> cm</p>
+        <a href="/doctor/patientQueue">Back to Patient Queue</a>
+    </div>
+</body>
+</html>
+</div>

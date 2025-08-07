@@ -1,0 +1,141 @@
+<div th:fragment="content" class="hospital-ui">
+    <!-- University Logo Placeholder -->
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+    
+    <h3 class="title">Lab Results</h3>
+    <!-- <div class="d-flex justify-content-between align-items-center mb-3">
+        <label for="labResultsFilter" class="fw-bold">Filter Queue:</label>
+        <select id="labResultsFilter" class="form-select w-auto">
+            <option value="pending">Pending</option>
+            <option value="all">All</option>
+            <option value="date">Sort by Date</option>
+        </select>
+    </div> -->
+    
+    
+    <form id="labResultsSearchForm" method="get" th:action="@{/doctor/lab-results/patient}" class="search-form">
+        <input type="text" name="keyword" placeholder="Search patients" th:value="${keyword}" class="input-field">
+        <button type="submit" class="btn primary-btn">Search by Name</button>
+        <a href="/doctor/lab-results" id="labResultsclearButton" class="btn secondary-btn">Clear</a>
+    </form>
+    
+    
+    <!-- Lab Results Table -->
+    <table id="labResultTable" class="styled-table">
+        <tr>
+            <th>Diagnosis ID</th>
+            <th>Patient Name</th>
+            <th>Test Ordered</th>
+            <th>Result</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+        <tr th:each="result : ${labResults}">
+            <td th:text="${result.diagnosis.diagnosisId}"></td>
+            <td th:text="${result.diagnosis.patientQueue.patient.name}"></td>
+            <td th:text="${result.diagnosis.labTest}"></td>
+            <td th:text="${result.resultDetails}"></td>
+            <td th:text="${result.date}"></td>
+            <td>
+                <a th:href="@{/doctor/prescription/{queueId}(queueId=${result.diagnosis.patientQueue.queueId})}" onclick="loadContent(this.href, event)">
+                    <button class="action-btn">Prescription</button>
+                </a>                
+            </td>
+        </tr>
+    </table>
+    <script>
+        $(document).ready(function() {
+            $("#labResultsFilter").change(function() {
+                let sortType = $(this).val();
+                $.get("/doctor/lab-results?sortType=" + sortType, function(data) {
+                    $("#content-area").html(data);
+                });
+            });
+        });
+    </script>
+
+
+<!-- Styling -->
+<style>
+    .hospital-ui {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .logo-container {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .logo {
+        max-height: 80px;
+    }
+    .logo-container {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .logo-container img {
+                max-width: 80px;
+                height: auto;
+            }
+
+    .title {
+        text-align: center;
+        color: #2c3e50;
+    }
+    .search-form {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .input-field {
+        padding: 8px;
+        margin-left: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .search-btn {
+        padding: 8px 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .search-btn:hover {
+        background-color: #0056b3;
+    }
+    .styled-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        background: white;
+    }
+    .styled-table th, .styled-table td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+    .styled-table th {
+        background-color: #007bff;
+        color: white;
+    }
+    .action-btn {
+        padding: 6px 12px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .action-btn:hover {
+        background-color: #218838;
+    }
+    .btn primary-btn{
+        background-color: #28a745;
+    }
+</style>
+</div>

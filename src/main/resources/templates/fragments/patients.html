@@ -1,0 +1,230 @@
+<div th:fragment="content" class="container"> 
+    <!-- University Logo -->
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+
+    <!-- Success/Error Alerts -->
+    <div id="alertPlaceholder">
+        <!-- Flash messages from controller redirects -->
+        <div th:if="${successMessage}" class="alert success-alert" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert error-alert" th:text="${errorMessage}"></div>
+    </div>
+
+    <!-- Dynamic Title -->
+    <h1 class="page-title" th:text="${getAll} ? 'All Patients' : 'Active Patients'"></h1>
+
+    <!-- Search Form -->
+    <form id="patientSearchForm" method="get"
+          th:action="${getAll} ? @{/receptionist/allPatients} : @{/receptionist/activePatients}"
+          class="search-form">
+        <input type="text" name="keyword" placeholder="Search patients"
+               th:value="${keyword}" class="input-field">
+        <button type="submit" class="btn primary-btn">Search</button>
+        <a href="/receptionist/patients" id="patientclearButton" class="btn btn-secondary">Clear</a>
+    </form>
+
+    <!-- Table of Patients -->
+    <table id="patientTable" class="styled-table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Reg No</th>
+                <th>Contact</th>
+                <th>DOB</th>
+                <th>Age</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="patient : ${patients}">
+                <td th:text="${patient.name}"></td>
+                <td th:text="${patient.regNo}"></td>
+                <td th:text="${patient.contact}"></td>
+                <td th:text="${patient.dob}"></td> 
+                <td th:text="${patient.age}"></td>
+                <td class="action-buttons">
+                    <a th:href="@{'/receptionist/editPatient/' + ${patient.id}}" class="btn success-btn">Edit</a>
+                    <a th:href="@{/receptionist/deactivatePatient/{id}(id=${patient.id})}" class="btn danger-btn">Deactivate</a>
+                    
+                    <!-- Add to Queue with Specifications Dropdown -->
+                    <form class="inline-form add-to-queue-form" th:data-patient-id="${patient.id}">
+                        <select name="specification" class="input-field">
+                            <option value="General Consultation">General Consultation</option>
+                            <option value="VCT">VCT</option>
+                            <option value="Dentist">Dentist</option>
+                            <option value="CMO">Chief Medical Officer</option>
+                        </select>
+                        <button type="submit" class="btn warning-btn">Add to Queue</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Add New Patient -->
+    <a th:href="@{/receptionist/addPatient}" class="btn primary-btn">Add New Patient</a>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script>
+        // Function to show and auto-hide alerts
+        function showAlert(message, isSuccess) {
+            const alertClass = isSuccess ? 'success-alert' : 'error-alert';
+            const alertIcon = isSuccess ? '✅' : '❌';
+            const alertHtml = `<div class="alert ${alertClass}">${alertIcon} ${message}</div>`;
+            
+            // Insert alert
+            $("#alertPlaceholder").html(alertHtml);
+            
+            // Auto-hide after 5 seconds
+            setTimeout(function() {
+                let alert = document.querySelector('.alert');
+                if(alert) {
+                    alert.style.transition = "opacity 0.5s";
+                    alert.style.opacity = "0";
+                    setTimeout(() => {
+                        alert.remove();
+                    }, 500);
+                }
+            }, 5000);
+        }
+
+        // Auto-hide existing alerts from server-side redirects
+        $(document).ready(function() {
+            setTimeout(function() {
+                let alerts = document.querySelectorAll('.alert');
+                alerts.forEach(alert => {
+                    alert.style.transition = "opacity 0.5s";
+                    alert.style.opacity = "0";
+                    setTimeout(() => alert.remove(), 500);
+                });
+            }, 5000);
+            
+            // Handle Add to Queue form submission
+            $(".add-to-queue-form").submit(function(event) {
+                event.preventDefault();
+                
+                const form = $(this);
+                const patientId = form.data('patient-id');
+                const specification = form.find('select[name="specification"]').val();
+                const url = `/receptionist/addToQueue/${patientId}`;
+                
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {
+                        specification: specification
+                    },
+                    success: function(response) {
+                        showAlert(`Patient added to queue successfully for ${specification}!`, true);
+                    },
+                    error: function(xhr) {
+                        showAlert('Failed to add patient to queue. Please try again.', false);
+                    }
+                });
+            });
+        });
+    </script>
+    
+    <!-- CSS Styling -->
+    <style>
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .logo-container img {
+            max-width: 80px;
+            height: auto;
+        }
+
+        .page-title {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .search-form {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .input-field {
+            padding: 8px;
+            margin-right: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .primary-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        .success-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .danger-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .warning-btn {
+            background-color: #ffc107;
+            color: black;
+        }
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .styled-table th, .styled-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        .styled-table thead {
+            background-color: #007bff;
+            color: white;
+        }
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .inline-form {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        .alert {
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            text-align: center;
+            font-size: 16px;
+        }
+        .success-alert {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error-alert {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</div>

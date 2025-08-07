@@ -1,0 +1,155 @@
+<div th:fragment="content">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="_csrf" th:content="${_csrf.token}"/>
+        <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Profile</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <style>
+            body {
+                background-color: #f4f6f9;
+            }
+            .profile-card {
+                max-width: 600px;
+                margin: 50px auto;
+                background: #fff;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            }
+            .profile-header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .btn-primary {
+                width: 100%;
+            }
+            .error-message {
+                color: red;
+                font-size: 14px;
+                display: none;
+            }
+        </style>
+    </head>
+    <body>
+    <div class="container">
+        <div class="logo-container">
+            <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+        </div>
+        <div class="profile-card">
+            <div class="profile-header">
+                <h3 th:text="${staff.name}"></h3>
+                <p th:text="${staff.role}"></p>
+            </div>
+            <ul class="list-group mb-3">
+                <li class="list-group-item"><strong>Work ID:</strong> <span th:text="${staff.workId}"></span></li>
+                <li class="list-group-item"><strong>Work Email:</strong> <span th:text="${staff.workEmail}"></span></li>
+                <li class="list-group-item"><strong>Contact:</strong> <span th:text="${staff.contact}"></span></li>
+            </ul>
+    
+            <h5>Change Password</h5>
+            <form id="profileForm">
+                <div class="mb-3">
+                    <label class="form-label">Current Password</label>
+                    <input type="password" id="currentPassword" name="currentPassword" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">New Password</label>
+                    <input type="password" id="newPassword" name="newPassword" class="form-control" required>
+                    <span class="error-message" id="passwordError">Password must be at least 8 characters long, include uppercase, lowercase, a number, and a special character.</span>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" class="form-control" required>
+                    <span class="error-message" id="confirmError">Passwords do not match.</span>
+                </div>
+                <button type="submit" class="btn btn-primary">Change Password</button>
+            </form>
+    
+            <div id="errorMessage" class="alert alert-danger mt-3" style="display:none;"></div>
+            <div id="successMessage" class="alert alert-success mt-3" style="display:none;"></div>
+        </div>
+    </div>
+    
+    <script>
+    $(document).ready(function() {
+        // Get CSRF token from meta tag
+        var csrfToken = $("meta[name='_csrf']").attr("content");
+        var csrfHeader = $("meta[name='_csrf_header']").attr("content");
+    
+        $("#profileForm").submit(function(event) {
+            event.preventDefault(); 
+            
+            let currentPassword = $("#currentPassword").val();
+            let newPassword = $("#newPassword").val();
+            let confirmPassword = $("#confirmPassword").val(); 
+            let passwordError = $("#passwordError");
+            let confirmError = $("#confirmError");
+            let errorMessage = $("#errorMessage");
+            let successMessage = $("#successMessage");
+            let isValid = true;
+    
+            passwordError.hide();
+            confirmError.hide();
+            errorMessage.hide();
+            successMessage.hide();
+    
+            // Client-side Password Validation
+            let passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            if (!passwordRegex.test(newPassword)) {
+                passwordError.show();
+                isValid = false;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                confirmError.show();
+                isValid = false;
+            }
+    
+            if (!isValid) return;
+    
+            // AJAX Submit with CSRF Token
+            $.ajax({
+                type: "POST",
+                url: "/profile/change-password",
+                contentType: "application/x-www-form-urlencoded",
+                data: {
+                    currentPassword: currentPassword,
+                    newPassword: newPassword,
+                    confirmPassword: confirmPassword
+                },
+                beforeSend: function(xhr) {
+                    xhr.setRequestHeader(csrfHeader, csrfToken);
+                },
+                success: function(response) {
+                    if (response === "success") {
+                        successMessage.text("Password changed successfully! Redirecting to login...").show();
+                        setTimeout(function() {
+                            window.location.href = "/login";
+                        }, 3000);
+                    } else {
+                        errorMessage.text(response).show();
+                    }
+                },
+                error: function(xhr) {
+                    if (xhr.status === 403) {
+                        errorMessage.text("Session expired or forbidden. Please log in again.").show();
+                    } else {
+                        errorMessage.text("An unexpected error occurred.").show();
+                    }
+                }
+            });
+        });
+    
+        // Clear error messages when user starts typing
+        $("input").on("input", function() {
+            $(this).removeClass("is-invalid");
+            $("#errorMessage").hide();
+        });
+    });
+    </script>
+    </body>
+    </div>
+    

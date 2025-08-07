@@ -1,0 +1,159 @@
+<div th:fragment="content" class="hospital-ui">   
+    <!-- University Logo -->
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+
+    <h3 class="title">Lab Test Requests</h3>
+    
+    <!-- Filter Dropdown -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <label for="labTestFilter" class="fw-bold">Filter Lab Tests:</label>
+        <select id="labTestFilter" class="form-select w-auto">
+            <option value="pending">Pending</option>
+            <option value="all">All</option>
+            <option value="date">Sort by Date</option>
+        </select> 
+    </div>
+
+    <!-- Search Form -->
+    <form id="labTestSearchForm" method="get" th:action="@{/lab/tests/patient}" class="search-form d-flex">
+        <input type="text" name="keyword" placeholder="Search patients" th:value="${keyword}" class="input-field">
+        <input type="hidden" name="sortType" id="sortTypeInput" th:value="${sortType}" />
+        <button type="submit" class="btn primary-btn">Search by Name</button>
+        <a href="/lab/tests/patient" id="labTestclearButton" class="btn secondary-btn">Clear</a>
+        
+    </form>
+
+    <!-- Loading Indicator -->
+    <div id="loading" class="loading" style="display: none;">Loading...</div>
+
+    <!-- Lab Test Requests Table -->
+    <div id="labTestTable" class="table-responsive">
+        <table class="table table-striped styled-table">
+            <thead>
+                <tr>
+                    <th>Diagnosis ID</th>
+                    <th>Patient Name</th>
+                    <th>Requested Test</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="diagnosis : ${labTests}">
+                    <td th:text="${diagnosis.diagnosisId}"></td>
+                    <td th:text="${diagnosis.patientQueue.patient.name}"></td>
+                    <td th:text="${diagnosis.labTest}"></td>
+                    <td th:text="${#temporals.format(diagnosis.dateTime, 'yyyy-MM-dd HH:mm')}"></td>
+                    <td>
+                        <a th:href="@{/lab/result/{diagnosisId}(diagnosisId=${diagnosis.diagnosisId})}" 
+                           class="action-btn" onclick="loadContent(this.href, event)">Enter Result</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- No Results Message -->
+    <div th:if="${labTests == null or #lists.isEmpty(labTests)}">
+        <p>No results found for "<span th:text="${keyword}"></span>".</p>
+    </div>
+
+    <!-- JavaScript for AJAX Filtering & Search -->
+    <script>
+        $(document).ready(function() {
+            $("#labTestFilter").change(function() {
+                let sortType = $(this).val();
+                $("#loading").show();
+                $.get("/lab/tests/patient?sortType=" + sortType, function(data) {
+                    $("#content").html(data);
+                    $("#loading").hide();
+                });
+            });
+            
+        });
+    </script>
+
+    <!-- Styling -->
+    <style>
+        .hospital-ui {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .logo-container img {
+                max-width: 80px;
+                height: auto;
+            }
+        .logo {
+            max-height: 80px;
+        }
+        .title {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .styled-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+        }
+        .styled-table th, .styled-table td {
+            padding: 10px;
+            border: 1px solid #0c0e9c;
+            text-align: center;
+        }
+        .styled-table th {
+            background-color: #007bff;
+            color: white;
+        }
+        .action-btn {
+            padding: 6px 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .action-btn:hover {
+            background-color: #218838;
+        }
+        .search-form {
+            margin-bottom: 20px;
+        }
+        .input-field {
+            padding: 8px;
+            margin-right: 8px;
+            width: 300px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            cursor: pointer;
+        }
+        .primary-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        .secondary-btn {
+            background-color: #ccc;
+            color: #333;
+        }
+        .primary-btn:hover {
+            background-color: #0056b3;
+        }
+        .loading {
+            text-align: center;
+            font-weight: bold;
+            color: #007bff;
+            margin-top: 10px;
+        }
+    </style>
+</div>

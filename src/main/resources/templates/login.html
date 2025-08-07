@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Staff Login | Egerton University</title>
+    <style>
+    body {
+        font-family: Arial, sans-serif;
+        background-image: url('/images/images (1).jpeg');
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-attachment: fixed;
+        background-size: contain; /* this makes the WHOLE image fit inside */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+    
+    .login-container {
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        width: 380px;
+    }
+    
+    .logo-container {
+        margin-bottom: 20px;
+    }
+    
+    .logo-container img {
+        width: 100px;
+        height: auto;
+    }
+    
+    h2 {
+        color: #004080;
+        margin-bottom: 20px;
+        font-size: 24px;
+        font-weight: bold;
+    }
+    
+    label {
+        display: block;
+        margin: 15px 0 5px;
+        text-align: left;
+        color: #333;
+        font-weight: bold;
+        font-size: 14px;
+    }
+    
+    input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 14px;
+    }
+    
+    button {
+        width: 100%;
+        background: #004080;
+        color: white;
+        padding: 14px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: background 0.3s;
+    }
+    
+    button:hover {
+        background: #003366;
+    }
+    
+    .error-message {
+        color: #ff0000;
+        margin-top: 15px;
+        font-size: 14px;
+    }
+    
+    .input-error {
+        border: 1px solid #ff0000;
+    }
+    
+    a {
+        color: #004080;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: bold;
+    }
+    
+    a:hover {
+        text-decoration: underline;
+    }
+    
+    @media (max-width: 480px) {
+        .login-container {
+            width: 90%;
+            padding: 30px;
+        }
+    }
+    </style>    
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo-container">
+            <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+        </div>
+        <h2>Staff Login</h2>
+        
+        <!-- Server-side error message display --
+         >
+        <p th:if="${param.error}" class="error-message">Invalid username or password</p>
+        <p th:if="${error}" class="error-message">[[${error}]]</p>
+        
+        <!-- Client-side error message display -->
+        <p id="clientErrorMessage" class="error-message" style="display: none;">Invalid username or password</p>
+        
+        <form th:action="@{/login}" method="post" id="loginForm" onsubmit="return validateForm()">
+            <label for="username">Work ID:</label>
+            <input type="text" id="username" name="username" required>
+
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+
+            <button type="submit">Login</button>
+        </form>
+        
+        <p>
+            <a th:href="@{/forgot-password}">Forgot Password?</a>
+        </p>
+    </div>
+
+    <script>
+        // Client-side validation
+        function validateForm() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorMessage = document.getElementById('clientErrorMessage');
+            
+            // Reset any previous error states
+            errorMessage.style.display = 'none';
+            document.getElementById('username').classList.remove('input-error');
+            document.getElementById('password').classList.remove('input-error');
+            
+            // Basic validation - you can expand this as needed
+            if (username === '' || password === '') {
+                errorMessage.textContent = 'Please enter both Work ID and Password';
+                errorMessage.style.display = 'block';
+                
+                if (username === '') document.getElementById('username').classList.add('input-error');
+                if (password === '') document.getElementById('password').classList.add('input-error');
+                
+                return false;
+            }
+            
+            // If you want to implement more complex client-side validation
+            // such as minimum password length, you can add it here
+            
+            return true; // Form will submit if validation passes
+        }
+        
+        // Check URL parameters for error message on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('error')) {
+                document.getElementById('clientErrorMessage').textContent = 'Invalid username or password';
+                document.getElementById('clientErrorMessage').style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

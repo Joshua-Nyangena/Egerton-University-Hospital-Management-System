@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c7be5;
+            --secondary: #6c757d;
+            --success: #00cc8e;
+            --info: #00bcd4;
+            --warning: #f6c343;
+            --danger: #e63757;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --white: #fff;
+            --sidebar-width: 280px;
+            --sidebar-collapsed: 70px;
+            --header-height: 70px;
+        }
+
+        body {
+            display: flex;
+            background-color: #f5f7fa;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            color: #3c4858;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: linear-gradient(145deg, #1a4f9c, #0d25ad);
+            color: white;
+            padding: 0;
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            z-index: 1040;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+
+        .sidebar-header {
+            padding: 20px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            height: var(--header-height);
+        }
+
+        .sidebar-header h4 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            padding: 10px 0;
+            overflow-y: auto;
+        }
+
+        .sidebar a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            border-radius: 0;
+            margin: 5px 0;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .sidebar a i {
+            margin-right: 15px;
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar.collapsed a i {
+            margin-right: 0;
+        }
+
+        .sidebar.collapsed a span {
+            display: none;
+        }
+
+        .sidebar a:hover, .sidebar a.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .sidebar-footer {
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logout {
+            display: flex;
+            align-items: center;
+            background: rgba(230, 55, 87, 0.8);
+            color: white;
+            text-align: center;
+            padding: 12px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            justify-content: center;
+        }
+
+        .logout:hover {
+            background: var(--danger);
+        }
+
+        .logout i {
+            margin-right: 10px;
+        }
+
+        .topbar {
+            height: var(--header-height);
+            background: var(--white);
+            color: var(--dark);
+            padding: 0 25px;
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            z-index: 1030;
+        }
+
+        .topbar.collapsed {
+            left: var(--sidebar-collapsed);
+        }
+
+        .toggle-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: var(--light);
+            color: var(--primary);
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .content-area {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--header-height);
+            padding: 25px;
+            width: calc(100% - var(--sidebar-width));
+            transition: all 0.3s ease;
+        }
+
+        .content-area.collapsed {
+            margin-left: var(--sidebar-collapsed);
+            width: calc(100% - var(--sidebar-collapsed));
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background: var(--white);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 15px 20px;
+            font-weight: 500;
+            border-radius: 10px 10px 0 0 !important;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .table {
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table thead th {
+            border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+            background: rgba(0, 0, 0, 0.02);
+            color: var(--secondary);
+            font-weight: 500;
+            padding: 12px 15px;
+        }
+
+        .table tbody td {
+            padding: 12px 15px;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        .btn {
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background: #1a68d1;
+            border-color: #1a68d1;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            border-color: var(--danger);
+        }
+
+        .form-control, .form-select {
+            padding: 0.6rem 1rem;
+            border-color: rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(44, 123, 229, 0.25);
+            border-color: var(--primary);
+        }
+
+        .badge {
+            padding: 0.5em 0.7em;
+            font-weight: 500;
+            border-radius: 5px;
+        }
+
+        /* Status indicators */
+        .status-urgent {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .status-stable {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .status-pending {
+            background-color: var(--warning);
+            color: var(--dark);
+        }
+
+        /* Dashboard stats cards */
+        .dashboard-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            flex: 1;
+            min-width: 220px;
+            padding: 20px;
+            border-radius: 10px;
+            background: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: center;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-right: 15px;
+        }
+
+        .icon-patients {
+            background: rgba(44, 123, 229, 0.1);
+            color: var(--primary);
+        }
+
+        .icon-appointments {
+            background: rgba(0, 188, 212, 0.1);
+            color: var(--info);
+        }
+
+        .icon-registered {
+            background: rgba(0, 204, 142, 0.1);
+            color: var(--success);
+        }
+
+        .icon-pending {
+            background: rgba(246, 195, 67, 0.1);
+            color: var(--warning);
+        }
+
+        .stat-info {
+            flex: 1;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            color: var(--secondary);
+            margin: 0;
+            font-size: 0.85rem;
+        }
+
+        /* Reports modal */
+        .reports-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .reports-modal-content {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .reports-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .reports-form label {
+            font-weight: 500;
+        }
+
+        .reports-form .form-group {
+            margin-bottom: 15px;
+        }
+
+        .reports-form .btn-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 992px) {
+            .sidebar {
+                width: var(--sidebar-collapsed);
+            }
+            
+            .sidebar a span {
+                display: none;
+            }
+            
+            .sidebar a i {
+                margin-right: 0;
+            }
+            
+            .topbar {
+                left: var(--sidebar-collapsed);
+            }
+            
+            .content-area {
+                margin-left: var(--sidebar-collapsed);
+                width: calc(100% - var(--sidebar-collapsed));
+            }
+            
+            .sidebar.expanded {
+                width: var(--sidebar-width);
+                z-index: 1050;
+            }
+            
+            .sidebar.expanded a span {
+                display: inline;
+            }
+            
+            .sidebar.expanded a i {
+                margin-right: 15px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-stats {
+                flex-direction: column;
+            }
+            
+            .stat-card {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <h4>Egerton System</h4>
+        </div>
+        <div class="sidebar-content">
+            <a href="#" class="nav-link" data-url="/profile">
+                <i class="fas fa-user"></i>
+                <span>My Profile</span>
+            </a>
+            <a href="#" class="nav-link" data-url="/admin/staffInterface">
+                <i class="fas fa-users-cog"></i>
+                <span>Staff Management</span>
+            </a>
+            <a href="#" class="nav-link" data-url="/receptionist/patientQueue">
+                <i class="fas fa-list-alt"></i>
+                <span>Patient Queue</span>
+            </a>
+            <a href="#" class="nav-link" data-url="/receptionist/appointments">
+                <i class="fas fa-calendar-check"></i>
+                <span>Appointments</span>
+            </a>
+            <a href="#" class="nav-link" data-url="/receptionist/registration">
+                <i class="fas fa-user-plus"></i>
+                <span>Patient Registration</span>
+            </a>
+            <!-- New reports link -->
+            <a href="#" class="nav-link" id="reportsLink">
+                <i class="fas fa-chart-bar"></i>
+                <span>Reports</span>
+            </a>
+        </div>
+        <div class="sidebar-footer">
+            <a class="logout" th:href="@{/logout}">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Topbar -->
+    <div id="topbar" class="topbar">
+        <button class="toggle-btn" onclick="toggleSidebar()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="dropdown">
+            <button class="btn btn-light dropdown-toggle d-flex align-items-center" type="button" id="staffDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-user-circle me-2"></i>
+                <span th:text="${staff.name}">Staff Name</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="staffDropdown">
+                <li><a class="dropdown-item" href="#" data-url="/profile"><i class="fas fa-user me-2"></i> My Profile</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i> Logout</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Reports Modal -->
+    <div id="reportsModal" class="reports-modal">
+        <div class="reports-modal-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h4 class="m-0">Generate Patient Visit Report</h4>
+                <button type="button" class="btn-close" id="closeReportsModal"></button>
+            </div>
+            <form action="/reports/patient-visit-summary" method="get" class="reports-form">
+                <div class="form-group">
+                    <label for="fromDate">From Date and Time:</label>
+                    <input type="datetime-local" class="form-control" id="fromDate" name="from" required>
+                </div>
+                <div class="form-group">
+                    <label for="toDate">To Date and Time:</label>
+                    <input type="datetime-local" class="form-control" id="toDate" name="to" required>
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn btn-secondary" id="cancelReports">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Download Report</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dynamic Content -->
+    <div id="content-area" class="content-area">
+        <h3 class="page-title">Welcome, Admin</h3>
+        
+        <div class="dashboard-stats">
+            <div class="stat-card">
+                <div class="stat-icon icon-patients">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h2 class="stat-number">32</h2>
+                    <p class="stat-label">Patients Today</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon icon-appointments">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="stat-info">
+                    <h2 class="stat-number">18</h2>
+                    <p class="stat-label">Appointments</p>
+                </div>
+            </div>
+            
+            <div class="stat-card">
+                <div class="stat-icon icon-registered">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="stat-info">
+                    <h2 class="stat-number">5</h2>
+                    <p class="stat-label">New Registrations</p>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-info-circle me-2"></i> Quick Actions</span>
+            </div>
+            <div class="card-body">
+                <p>Select an option from the sidebar to manage patients and staff.</p>
+                <div class="row mt-4">
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <a href="#" class="btn btn-primary w-100" data-url="/receptionist/patientQueue">
+                            <i class="fas fa-list-alt me-2"></i> Manage Queue
+                        </a>
+                    </div>
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <a href="#" class="btn btn-info w-100 text-white" data-url="/receptionist/appointments">
+                            <i class="fas fa-calendar-check me-2"></i> View Appointments
+                        </a>
+                    </div>
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <a href="#" class="btn btn-success w-100" data-url="/receptionist/registration">
+                            <i class="fas fa-user-plus me-2"></i> Register Patient
+                        </a>
+                    </div>
+                    <div class="col-md-6 col-lg-3 mb-3">
+                        <a href="#" class="btn btn-secondary w-100" data-url="/profile">
+                            <i class="fas fa-user me-2"></i> My Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function loadContent(url, event) {
+            event.preventDefault(); // Prevent default link behavior
+
+            fetch(url)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById("content-area").innerHTML = html;
+                })
+                .catch(error => console.error('Error loading content:', error));
+        }
+         
+        function toggleSidebar() {
+            document.getElementById("sidebar").classList.toggle("collapsed");
+            document.getElementById("topbar").classList.toggle("collapsed");
+            document.getElementById("content-area").classList.toggle("collapsed");
+        }
+
+        // Reports modal functions
+        function openReportsModal() {
+            document.getElementById("reportsModal").style.display = "flex";
+        }
+
+        function closeReportsModal() {
+            document.getElementById("reportsModal").style.display = "none";
+        }
+
+        $(document).ready(function () {
+            let defaultView = "/";
+            let storedView = sessionStorage.getItem("lastView");
+            let initialView = storedView || defaultView;
+            $("#content-area").load(initialView);
+
+            $(".nav-link, .dropdown-item, .btn[data-url]").click(function (e) {
+                e.preventDefault();
+                let url = $(this).data("url");
+                if (!url) return;
+
+                sessionStorage.setItem("lastView", url);
+                $(".nav-link").removeClass("active");
+                $(`.nav-link[data-url='${url}']`).addClass("active");
+
+                $("#content-area").load(url);
+            });
+ 
+            // Reports modal handling
+            $("#reportsLink").click(function(e) {
+                e.preventDefault();
+                openReportsModal();
+            });
+
+            $("#closeReportsModal, #cancelReports").click(function() {
+                closeReportsModal();
+            });
+
+            // Close modal if clicking outside of it
+            $(window).click(function(e) {
+                if (e.target == document.getElementById("reportsModal")) {
+                    closeReportsModal();
+                }
+            });
+
+            // Handle Staff Search via AJAX
+            $(document).on("submit", "#searchForm", function(event) {
+                event.preventDefault();
+                let formData = $(this).serialize();
+
+                $.get("/admin/searchStaff", formData, function(data) {
+                    $("#staffContent").html($(data).find("#staffContent").html()); // Update only the staff table
+                }).fail(function() {
+                    alert("Error retrieving staff data.");
+                    $.get("/admin/staffList", formData, function(data) {
+                        $("#staffContent").html($(data).find("#staffContent").html());
+                    });
+                });
+            });
+
+            $(document).on("click", "#clearButton", function(event) {
+                event.preventDefault(); // Prevent full page reload
+
+                $.get("/admin/staffList", function(data) {
+                    $("#staffContent").html($(data).find("#staffContent").html()); // Reload only the staff list
+                    $("#searchForm input[name='keyword']").val(""); // Clear search input field
+                }).fail(function() {
+                    alert("Error resetting staff list.");
+                });
+            });
+
+            $(document).on("submit", "#addStaffForm", function(event) {
+                event.preventDefault(); // Prevent default form submission
+                let formData = $(this).serialize();
+
+                $.post("/admin/saveStaff", formData, function(response) {
+                    // Check if response contains validation errors
+                    if ($(response).find(".error-message").length > 0) {
+                        // Update only the form fields and error messages without replacing the entire form
+                        $("#addStaffForm").replaceWith($(response).find("#addStaffForm"));
+                    } else {
+                        // Clear previous error messages
+                        $(".error-message").text("");
+
+                        // Display success message above the form
+                        $("#addStaffForm").before('<p id="successMessage" style="color: green; text-align: center;">Staff added successfully!</p>');
+
+                        // Clear form fields after successful submission
+                        $("#addStaffForm")[0].reset();
+
+                        // Wait 3 seconds before redirecting to staff list
+                        setTimeout(() => {
+                            $("#content-area").load("/admin/staffList");
+                        }, 3000); // Delay of 3 seconds
+                    }
+                }).fail(function(xhr) {
+                    alert("An unexpected error occurred.");
+                });
+            });
+
+            $(document).on("submit", "#editStaffForm", function(event) {
+                event.preventDefault(); // Prevent default form submission
+                let formData = $(this).serialize();
+
+                $.post("/admin/updateStaff", formData, function(response) {
+                    // Check if response contains validation errors
+                    if ($(response).find(".error-message").length > 0) {
+                        // Update only the form fields and error messages without replacing the entire form
+                        $("#editStaffForm").replaceWith($(response).find("#editStaffForm"));
+                    } else {
+                        // Clear previous error messages
+                        $(".error-message").text("");
+
+                        // Display success message above the form
+                        $("#editStaffForm").before('<p id="successMessage" style="color: green; text-align: center;">Staff updated successfully!</p>');
+
+                        // Clear form fields after successful submission
+                        $("#editStaffForm")[0].reset();
+
+                        // Wait 3 seconds before redirecting to staff list
+                        setTimeout(() => {
+                            $("#content-area").load("/admin/staffList");
+                        }, 3000); // Delay of 3 seconds
+                    }
+                }).fail(function(xhr) {
+                    alert("An unexpected error occurred.");
+                });
+            });
+
+            $(document).on("submit", "#profileForm", function(event) {
+                event.preventDefault();
+                $.post("/profile/change-password", $(this).serialize(), function() {
+                    sessionStorage.setItem("lastView", "/profile");
+                    $("#content-area").load("/profile");
+                }).fail(function() {
+                    alert("Error changing password.");
+                });
+            });
+        });
+    </script>
+
+</body>
+</html>

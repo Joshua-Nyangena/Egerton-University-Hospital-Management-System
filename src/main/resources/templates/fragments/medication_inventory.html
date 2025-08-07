@@ -1,0 +1,102 @@
+<div th:fragment="content" class="hospital-ui">
+    <!-- University Logo Placeholder -->
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+    
+    <h3 class="title">Medication Inventory</h3>
+
+    <!-- Search Form -->
+    <form method="get" th:action="@{/medication/inventory/meds}" class="search-form">
+        <input type="text" name="keyword" placeholder="Search by Name, Supplier, or ID" th:value="${keyword}">
+        <button type="submit">Search</button>
+        <a href="/medication/inventory/meds" class="btn-clear">Clear</a>
+    </form>
+
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Medication Name</th>
+                <th>Quantity</th>
+                <th>Supplier</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="medication : ${medications}">
+                <td th:text="${medication.id}"></td>
+                <td th:text="${medication.name}"></td>
+                <td th:text="${medication.quantity}"></td>
+                <td th:text="${medication.supplier}"></td>
+                <td class="action-buttons">
+                    <!-- Issue Medication Form -->
+                    <form th:action="@{/medication/issueMedication}" method="post">
+                        <input type="hidden" name="medicationName" th:value="${medication.name}">
+                        <button type="submit" class="issue-btn" th:if="${medication.quantity > 0}">Issue Medication</button>
+                    </form>
+
+                    <!-- Request Restock Form -->
+                    <form th:action="@{/medication/requestRestock/{id}(id=${medication.id})}" method="post">
+                        <button type="submit" class="restock-btn" th:if="${medication.quantity == 0}">Request Restock</button>
+                    </form>
+
+                    <!-- Record Delivery Form -->
+                    <form th:action="@{/medication/recordDelivery}" method="post">
+                        <input type="hidden" name="medicationId" th:value="${medication.id}">
+                        <input type="number" name="quantityDelivered" placeholder="Enter quantity" required>
+                        <button type="submit" class="delivery-btn">Record Delivery</button>
+                    </form>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="navigation-links">
+        <a th:href="@{/medication/addMedication}" class="nav-link">Add New Medication</a>
+        <a th:href="@{/pharmacy/prescriptions}" class="nav-link">Back to Prescriptions</a>
+        <a href="/logout" class="nav-link logout">Logout</a>
+    </div>
+
+<!-- Styling -->
+<style>
+    .search-form {
+        margin-bottom: 20px;
+        text-align: center;
+    }
+    .search-form input {
+        padding: 8px;
+        width: 300px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+    }
+    .search-form button, .btn-clear {
+        padding: 8px 16px;
+        margin-left: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .btn-clear {
+        background-color: #dc3545;
+    }
+    .logo-container {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .logo-container img {
+                max-width: 80px;
+                height: auto;
+            }
+
+    .search-form button:hover {
+        background-color: #0056b3;
+    }
+    .btn-clear:hover {
+        background-color: #c82333;
+    }
+</style>
+</div>

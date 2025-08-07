@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+    name="PatientQueueReport" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="30" rightMargin="30" topMargin="20" bottomMargin="20" uuid="c4a4fcd5-9842-4e96-8200-4502bb55669c">
+
+    <!-- Parameters -->
+    <parameter name="createdBy" class="java.lang.String"/>
+
+    <!-- Fields -->
+    <field name="queueId" class="java.lang.String"/>
+    <field name="patient.name" class="java.lang.String"/>
+    <field name="status" class="com.eusan.eusanapp.Entity.Status"/>
+    <field name="specification" class="java.lang.String"/>
+    <field name="dateFormatted" class="java.lang.String"/>
+
+    <!-- Variables -->
+    <variable name="SpecCount" class="java.lang.Integer" calculation="Count" resetType="Group" resetGroup="SpecGroup">
+        <variableExpression><![CDATA[$F{specification}]]></variableExpression>
+    </variable>
+
+    <!-- Group Definition -->
+    <group name="SpecGroup">
+        <groupExpression><![CDATA[$F{specification}]]></groupExpression>
+    </group>
+
+    <!-- Title -->
+    <title>
+        <band height="70">
+            <textField>
+                <reportElement x="0" y="10" width="535" height="40" uuid="e2b4f63d-88f0-4a25-8081-b30b6e42a171"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font size="18" isBold="true" pdfFontName="Helvetica-Bold"/>
+                </textElement>
+                <textFieldExpression><![CDATA["Egerton University Sanitorium – Patient Visit Summary"]]></textFieldExpression>
+            </textField>
+        </band>
+    </title>
+
+    <!-- Column Headers -->
+    <columnHeader>
+        <band height="35" splitType="Stretch">
+            <rectangle>
+                <reportElement x="0" y="0" width="535" height="30" backcolor="#f2f2f2" mode="Opaque"/>
+            </rectangle>
+
+            <staticText>
+                <reportElement x="0" y="5" width="80" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Queue ID]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="80" y="5" width="120" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Patient Name]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="200" y="5" width="80" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Status]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="280" y="5" width="120" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Specification]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="400" y="5" width="135" height="20"/>
+                <textElement textAlignment="Center" verticalAlignment="Middle">
+                    <font isBold="true"/>
+                </textElement>
+                <text><![CDATA[Date]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+
+    <!-- Detail Rows -->
+    <detail>
+        <band height="30" splitType="Stretch">
+            <rectangle>
+                <reportElement x="0" y="0" width="535" height="30" backcolor="#ffffff" mode="Transparent"/>
+            </rectangle>
+
+            <textField>
+                <reportElement x="0" y="5" width="80" height="20"/>
+                <textFieldExpression><![CDATA[$F{queueId}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="80" y="5" width="120" height="20"/>
+                <textFieldExpression><![CDATA[$F{patient.name}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="200" y="5" width="80" height="20"/>
+                <textFieldExpression><![CDATA[$F{status}.toString()]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="280" y="5" width="120" height="20"/>
+                <textFieldExpression><![CDATA[$F{specification}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="400" y="5" width="135" height="20"/>
+                <textFieldExpression><![CDATA[$F{dateFormatted}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+
+    <!-- Summary: Chart Section -->
+    <summary>
+        <band height="260">
+            <frame>
+                <reportElement x="0" y="0" width="535" height="250" backcolor="#f9f9f9" mode="Opaque"/>
+                <barChart>
+                    <chart>
+                        <reportElement x="15" y="10" width="500" height="200" uuid="e7f9c5d1-bb0a-4cb3-a876-88fd16d5d111"/>
+                        <chartTitle>
+                            <font size="14" isBold="true"/>
+                            <titleExpression><![CDATA["Patient Count per Specification"]]></titleExpression>
+                        </chartTitle>
+                        <chartLegend/>
+                    </chart>
+
+                    <categoryDataset>
+                        <dataset resetType="Report"/>
+                        <categorySeries>
+                            <seriesExpression><![CDATA["Patients"]]></seriesExpression>
+                            <categoryExpression><![CDATA[$F{specification}]]></categoryExpression>
+                            <valueExpression><![CDATA[$V{SpecCount}]]></valueExpression>
+                        </categorySeries>
+                    </categoryDataset>
+
+                    <barPlot>
+                        <plot/>
+                        <categoryAxisLabelExpression><![CDATA["Specification"]]></categoryAxisLabelExpression>
+                        <valueAxisLabelExpression><![CDATA["Count"]]></valueAxisLabelExpression>
+                    </barPlot>
+                </barChart>
+            </frame>
+        </band>
+    </summary>
+
+</jasperReport>

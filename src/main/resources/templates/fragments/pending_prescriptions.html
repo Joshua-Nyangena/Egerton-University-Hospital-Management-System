@@ -1,0 +1,110 @@
+<div th:fragment="content" class="container">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h3 {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+        }
+        select {
+            padding: 5px;
+            border-radius: 4px;
+            border: 1px solid #ced4da;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .table th, .table td {
+            border: 1px solid #dee2e6;
+            padding: 10px;
+            text-align: left;
+        }
+        .table th {
+            background-color: #343a40;
+            color: white;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: #f2f2f2;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .logo-container img {
+                max-width: 80px;
+                height: auto;
+            }
+
+    </style>
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+    
+    <h3>🗉️ Prescriptions Ordered</h3>
+    <form id="prescriptionSearchForm" method="get" th:action="@{/pharmacy/prescriptions}" class="search-form">
+        <input type="text" name="keyword" placeholder="Search by Patient Name or ID" th:value="${keyword}" class="input-field">
+        <button type="submit" class="btn primary-btn">Search</button>
+        <a href="/pharmacy/prescriptions" id="prescriptionclearButton" class="btn btn-secondary">Clear</a>
+    </form>
+    <!-- Filter Section -->
+
+    <!-- Styled Table -->
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Patient Name</th>
+                    <th>ID</th>
+                    <th>Diagnosis ID</th>
+                    <th>Prescription Details</th>
+                    <th>Date & Time</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="prescriptionTable">
+                <tr th:each="prescription : ${prescriptions}">
+                    <td th:text="${prescription.diagnosis.patientQueue.patient.name}"></td>
+                    <td th:text="${prescription.id}"></td>
+                    <td th:text="${prescription.diagnosis.diagnosisId}"></td>
+                    <td th:text="${prescription.prescriptionDetails}"></td>
+                    <td th:text="${prescription.dateTime}"></td>
+                    <td>
+                        <form th:action="@{/pharmacy/issueMedication/{id}(id=${prescription.id})}" method="post">
+                            <button type="submit" class="btn-success">Issue Medication</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    
+    
+    </div>
+    

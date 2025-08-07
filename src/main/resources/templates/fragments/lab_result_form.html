@@ -1,0 +1,128 @@
+
+<div th:fragment="content" class="container">
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+
+    <h2>Enter Lab Result</h2>
+    <form id="labResultForm" th:action="@{/lab/saveResult}" method="post" onsubmit="submitForm('labResultForm');">
+        <input type="hidden" name="diagnosisId" th:value="${diagnosis.diagnosisId}" />
+
+        <div class="form-group">
+            <label><strong>Patient:</strong></label>
+            <p th:text="${diagnosis.patientQueue.patient.name}"></p>
+        </div>
+
+        <div class="form-group">
+            <label><strong>Test Requested:</strong></label>
+            <p th:text="${diagnosis.labTest}"></p>
+        </div>
+
+        <div class="form-group">
+            <label for="resultDetails">Lab Result:</label>
+            <textarea id="resultDetails" name="resultDetails" required></textarea>
+        </div>
+
+        <button type="submit" class="btn-primary">Save Result</button>
+    </form>
+
+    <script>
+        $(document).ready(function() {
+            $("#labResultForm").submit(function(event) {
+                event.preventDefault();
+    
+                $.ajax({
+                    type: "POST",
+                    url: "/lab/saveResult",
+                    data: $(this).serialize(),
+                    success: function() {
+                        alert("Lab Results submitted successfully!");
+                        $("#content").load("/lab/tests");
+                    },
+                    error: function() {
+                        alert("Error submitting lab Result.");
+                    }
+                });
+            });
+        });
+    </script>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        margin: 20px;
+    }
+    .container {
+        max-width: 600px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2 {
+        color: #007bff;
+        border-bottom: 2px solid #007bff;
+        padding-bottom: 5px;
+        margin-bottom: 15px;
+        text-align: center;
+    }
+    .form-group {
+        margin-bottom: 15px;
+    }
+    label {
+        font-weight: bold;
+    }
+    .logo-container img {
+                max-width: 80px;
+                height: auto;
+            }
+    input[type="text"], input[type="date"], input[type="number"], textarea {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        width: 100%;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+    }
+    .alert {
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 4px;
+    }
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    .close {
+        float: right;
+        font-size: 1.2rem;
+        font-weight: bold;
+        line-height: 1;
+        color: #000;
+        opacity: 0.5;
+        border: none;
+        background: none;
+    }
+    .close:hover {
+        opacity: 1;
+    }
+</style>
+</div>

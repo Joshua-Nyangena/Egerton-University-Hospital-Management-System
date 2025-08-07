@@ -1,0 +1,56 @@
+<div th:fragment="content" class="triage-container">
+    <!-- University Logo Holder -->
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+    <h2>Triage Details</h2>
+    
+    <div class="triage-details">
+        <p><strong>Blood Pressure:</strong> <span th:text="${triage.bloodPressure}"></span></p>
+        <p><strong>Heart Rate:</strong> <span th:text="${triage.heartRate}"></span></p>
+        <p><strong>Temperature:</strong> <span th:text="${triage.temperature}"></span></p>
+        <p><strong>Weight:</strong> <span th:text="${triage.weight}"></span></p>
+        <p><strong>Height:</strong> <span th:text="${triage.height}"></span></p>
+    </div>
+
+
+<!-- CSS Styling -->
+<style>
+/* General Container */
+.triage-container {
+    max-width: 600px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+}
+
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #004080;
+}
+
+.logo-holder {
+    font-size: 18px;
+    font-weight: bold;
+    color: #004080;
+}
+
+/* Triage Details */
+.triage-details p {
+    font-size: 16px;
+    padding: 8px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.triage-details p:last-child {
+    border-bottom: none;
+}
+</style>
+</div>

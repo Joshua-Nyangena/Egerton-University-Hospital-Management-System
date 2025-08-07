@@ -1,0 +1,100 @@
+<div th:fragment="admittedFragment">
+<head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <style>
+        .error-message {
+            color: red;
+            font-size: 14px;
+            display: block;
+            margin-top: 5px;
+        }
+        .logo-container img {
+                max-width: 80px;
+                height: auto;
+            }
+    </style>
+</head>
+<body>
+<div class="container mt-4">
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+
+    <h2 class="text-center text-warning">Patient Admission Form</h2>
+
+    <form id="admitForm" th:action="@{/doctor/saveAdmit}" method="post" th:object="${admittedPatient}">
+        <input type="hidden" name="queueId" th:value="${queue.queueId}" />
+
+        <div class="mb-3">
+            <label class="form-label">Doctor Admitting:</label>
+            <input type="text" class="form-control" name="doctorName" th:value="${doctorName}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Doctor Work ID:</label>
+            <input type="text" class="form-control" name="doctorWorkId" th:value="${doctorWorkId}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Patient Name:</label>
+            <input type="text" class="form-control" name="patientName" th:value="${queue.patient.name}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Ward:</label>
+            <select name="ward" id="ward" class="form-control" required>
+                <option value="">Select Ward</option>
+                <option value="Ward 1">Ward 1</option>
+                <option value="Ward 2">Ward 2</option>
+                <option value="Ward 3">Ward 3</option>
+            </select>
+            <span class="error-message" id="wardError"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Admission Reason:</label>
+            <textarea name="admissionReason" id="admissionReason" class="form-control" rows="4" required></textarea>
+            <span class="error-message" id="admissionReasonError"></span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Guardian Contact (Email):</label>
+            <input type="email" name="guardianEmail" id="guardianEmail" class="form-control" required>
+            <span class="error-message" id="guardianEmailError"></span>
+        </div>
+
+        <button type="submit" class="btn btn-warning w-100">Admit Patient</button>
+    </form>
+
+    <p th:if="${success}" th:text="${success}" style="color: green; text-align: center;"></p>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $("#admitForm").submit(function (event) {
+            event.preventDefault();
+            let isValid = true;
+            $(".error-message").text("");
+
+            if ($("#ward").val().trim() === "") {
+                $("#wardError").text("Please select a ward.");
+                isValid = false;
+            }
+
+            if ($("#admissionReason").val().trim().length < 5) {
+                $("#admissionReasonError").text("Admission reason must be at least 5 characters.");
+                isValid = false;
+            }
+
+            let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test($("#guardianEmail").val().trim())) {
+                $("#guardianEmailError").text("Please enter a valid email address.");
+                isValid = false;
+            }
+
+            if (isValid) this.submit();
+        });
+    });
+</script>
+</div>

@@ -1,0 +1,133 @@
+<div th:fragment="content" class="container">
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css">
+        <style>
+            .error-message {
+                color: red;
+                font-size: 14px;
+                display: block;
+                margin-top: 5px;
+            }
+        </style>
+    </head>
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+
+    <h2 class="text-center text-primary">Register Staff</h2>
+
+    <form id="addStaffForm" th:action="@{/admin/saveStaff}" method="post" th:object="${staff}">
+        <div class="mb-3">
+            <label for="name" class="form-label">Full Name</label>
+            <input type="text" id="name" name="name" class="form-control" required pattern="^[a-zA-Z\s]+$" 
+                   title="Name must contain only letters and spaces." th:value="*{name}">
+            <span class="error-message" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="contact" class="form-label">Phone Number</label>
+            <input type="tel" id="contact" name="contact" class="form-control" required>
+            <span class="error-message" th:if="${#fields.hasErrors('contact')}" th:errors="*{contact}"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="nationalId" class="form-label">National ID</label>
+            <input type="text" id="nationalId" name="nationalId" class="form-control" required pattern="^[0-9]{6,14}$"
+                   title="National ID must be between 6 and 14 digits." th:value="*{nationalId}">
+            <span class="error-message" th:if="${#fields.hasErrors('nationalId')}" th:errors="*{nationalId}"></span>
+        </div>
+
+        <div class="mb-3">
+            <label for="contractExpiryDate" class="form-label">Contract Expiry Date</label>
+            <input type="date" id="contractExpiryDate" name="contractExpiryDate" class="form-control" required>
+        </div>
+        
+        <div class="mb-3">
+            <label for="personalEmail" class="form-label">Personal Email</label>
+            <input type="email" id="personalEmail" name="personalEmail" class="form-control" required
+                   title="Please enter a valid email address." th:value="*{personalEmail}">
+            <span class="error-message" th:if="${#fields.hasErrors('personalEmail')}" th:errors="*{personalEmail}"></span>
+        </div>
+        
+
+        <div class="mb-3">
+            <label for="role" class="form-label">Role</label>
+            <select id="role" name="role" class="form-select" required>
+                <option value="ADMIN">Admin</option>
+                <option value="DOCTOR">Doctor</option>
+                <option value="RECEPTIONIST">Receptionist</option>
+                <option value="LAB_TECHNICIAN">Lab Technician</option>
+                <option value="PHARMACIST">Pharmacist</option>
+                <option value="TRIAGE_OFFICER">Triage Officer</option>
+                <option value="DENTIST">Dentist</option>
+                <option value="CHIEF_MEDICAL_OFFICER">Chief Medical Officer</option>
+                <option value="INFECTIOUS_DOCTOR">Infectious Doctor</option>
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Register Staff</button>
+    </form>
+
+    <script>
+        $(document).ready(function () {
+            // Initialize international phone input
+            let phoneInput = document.querySelector("#contact");
+            let iti = window.intlTelInput(phoneInput, {
+                preferredCountries: ["ke", "us", "gb"],
+                separateDialCode: true,
+                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js"
+            });
+
+            let expiryDate = new Date($("#contractExpiryDate").val());
+let today = new Date();
+today.setHours(0,0,0,0); // normalize
+
+if (expiryDate <= today) {
+    $("#contractExpiryDate").after("<span class='error-message'>Expiry date must be in the future.</span>");
+    isValid = false;
+}
+
+
+            // Validate form on submission
+            $("#addStaffForm").submit(function (event) {
+                event.preventDefault();
+
+                let isValid = true;
+                $(".error-message").text("");
+
+                let name = $("#name").val().trim();
+                if (!/^[a-zA-Z\s]+$/.test(name)) {
+                    $("#name").next(".error-message").text("Name must contain only letters and spaces.");
+                    isValid = false;
+                }
+
+                let nationalId = $("#nationalId").val().trim();
+                if (!/^[0-9]{6,14}$/.test(nationalId)) {
+                    $("#nationalId").next(".error-message").text("National ID must be between 6 and 14 digits.");
+                    isValid = false;
+                }
+
+                let phoneNumber = iti.getNumber();
+                if (!iti.isValidNumber()) {
+                    $("#contact").next(".error-message").text("Invalid phone number.");
+                    isValid = false;
+                }
+
+                let email = $("#personalEmail").val().trim();
+                if (!email.match(/^[^@]+@[^@]+\.[a-zA-Z]{2,}$/)) {
+                    $("#personalEmail").next(".error-message").text("Invalid email format.");
+                    isValid = false;
+                }
+
+                if (isValid) {
+                    this.submit();
+                }
+            });
+        });
+    </script>
+
+    <p th:if="${success}" th:text="${success}" style="color: green; text-align: center;"></p>
+</div>

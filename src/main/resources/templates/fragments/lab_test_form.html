@@ -1,0 +1,124 @@
+<div th:fragment="content" class="container">
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+
+    <h2 class="text-center text-primary">Lab Test Request</h2>
+
+    <!-- Success Message -->
+    <p th:if="${success}" th:text="${success}" class="alert alert-success text-center"></p>
+
+    <form id="labTestForm" th:action="@{/doctor/saveLabTest}" method="post">
+        <input type="hidden" name="queueId" th:value="${queue.queueId}">
+        <input type="hidden" name="diagnosisId" th:value="${diagnosisId}">
+
+        <div class="mb-3">
+            <label class="form-label">Patient Name:</label>
+            <input type="text" class="form-control" th:value="${queue.patient.name}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Reg No:</label>
+            <input type="text" class="form-control" th:value="${queue.patient.regNo}" readonly>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Lab Test:</label>
+            <textarea name="labTest" id="labTest" class="form-control" rows="5" required 
+                      placeholder="Enter lab test details..."></textarea>
+            <span class="text-danger" id="labTestError"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 mb-2">Submit Lab Test</button>
+    </form>
+
+    <!-- Admit Button -->
+    <form th:action="@{/doctor/admitForm/{queueId}(queueId=${queue.queueId})}" method="get" onclick="loadContent(this.action, event)">
+
+        <input type="hidden" name="queueId" th:value="${queue.queueId}">
+        <button type="submit" class="btn btn-warning w-100" >Admit Patient</button>
+    </form>
+    <!-- <a th:href="@{/lab/result/{diagnosisId}(diagnosisId=${diagnosis.diagnosisId})}" 
+    class="action-btn" onclick="loadContent(this.href, event)">Enter Result</a> -->
+    <script>
+        $(document).ready(function () {
+            $("#labTestForm").submit(function (event) {
+                event.preventDefault();
+                let isValid = true;
+                $("#labTestError").text("");
+
+                let labTest = $("#labTest").val().trim();
+                if (labTest.length < 10) {
+                    $("#labTestError").text("Lab test details must be at least 10 characters.");
+                    isValid = false;
+                }
+
+                if (isValid) {
+                    this.submit();
+                }
+            });
+        });
+    </script>
+</div>
+
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 20px;
+        }
+        .logo-container img {
+                max-width: 80px;
+                height: auto;
+            }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .alert {
+            font-weight: bold;
+            padding: 10px;
+        }
+    </style>
+</div>

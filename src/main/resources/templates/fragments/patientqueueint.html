@@ -1,0 +1,66 @@
+<div th:fragment ="content">
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100vh;
+            position: relative;
+        }  
+        .logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 120px;
+            height: 120px;
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .logo-container img {
+                max-width: 80px;
+                height: auto;
+            }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 600px;
+        }
+        .btn {
+            display: block;
+            width: 80%;
+            padding: 10px;
+            margin: 10px auto;
+            border: none;
+            background: #28a745;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 6px;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background: #218838;
+        }
+    </style>
+<body>
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+    <div class="container">
+        <h2>Patient Queue</h2>
+        <a th:href="@{/doctor/allPatientsQueue}" class="btn" onclick="loadContent(this.href, event)" >View All Patients</a>
+        <a th:href="@{/doctor/pendingTriagedQueue}" class="btn" onclick="loadContent(this.href, event)" >View Pending Patients</a>
+        <a th:href="@{/logout}" class="btn">Logout</a>
+    </div>
+</body>
+</div>

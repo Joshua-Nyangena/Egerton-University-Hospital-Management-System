@@ -1,0 +1,245 @@
+<div th:fragment="content" class="container">
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+    <h2>Record Triage</h2>
+    
+    <form id="triageForm" th:action="@{/triage/saveTriage}" th:object="${triage}" method="post">
+        <input type="hidden" name="queueId" th:value="${queueId}">
+        
+        <div class="input-group">
+            <label for="temperature">Temperature (°C):</label>
+            <input type="number" id="temperature" name="temperature" th:field="*{temperature}" step="0.1" min="35.0" max="42.0" required/>
+            <span class="error-message" id="temperature-error"></span>
+            <span class="hint">Normal range: 36.1°C - 37.2°C</span>
+        </div>
+        
+        <div class="input-group">
+            <label for="pulseRate">Pulse Rate (BPM):</label>
+            <input type="number" id="pulseRate" name="pulseRate" th:field="*{pulseRate}" min="40" max="200" required/>
+            <span class="error-message" id="pulseRate-error"></span>
+            <span class="hint">Normal range: 60-100 BPM</span>
+        </div>
+        
+        <div class="input-group">
+            <label for="bloodPressure">Blood Pressure (mmHg):</label>
+            <input type="number" id="bloodPressure" name="bloodPressure" th:field="*{bloodPressure}" min="70" max="200" required/>
+            <span class="error-message" id="bloodPressure-error"></span>
+            <span class="hint">Normal range: 90-120 mmHg (systolic)</span>
+        </div>
+        
+        <div class="input-group">
+            <label for="weight">Weight (kg):</label>
+            <input type="number" id="weight" name="weight" th:field="*{weight}" step="0.1" min="2.0" max="300.0" required/>
+            <span class="error-message" id="weight-error"></span>
+        </div>
+        
+        <div class="input-group">
+            <label for="height">Height (cm):</label>
+            <input type="number" id="height" name="height" th:field="*{height}" step="0.1" min="30.0" max="250.0" required/>
+            <span class="error-message" id="height-error"></span>
+        </div>
+        
+        <button type="submit">Save Triage Data</button>
+    </form>
+    
+    <script>
+        $(document).ready(function() {
+            // Validation functions
+            function validateTemperature(temp) {
+                const value = parseFloat(temp);
+                if (isNaN(value)) return "Temperature must be a number";
+                if (value < 35.0) return "Temperature must be at least 35.0°C";
+                if (value > 42.0) return "Temperature must be at most 42.0°C";
+                return "";
+            }
+            
+            function validatePulseRate(pulse) {
+                const value = parseInt(pulse);
+                if (isNaN(value)) return "Pulse rate must be a number";
+                if (value < 40) return "Pulse rate must be at least 40 BPM";
+                if (value > 200) return "Pulse rate must be at most 200 BPM";
+                return "";
+            }
+            
+            function validateBloodPressure(bp) {
+                const value = parseInt(bp);
+                if (isNaN(value)) return "Blood pressure must be a number";
+                if (value < 70) return "Blood pressure must be at least 70 mmHg";
+                if (value > 200) return "Blood pressure must be at most 200 mmHg";
+                return "";
+            }
+            
+            function validateWeight(weight) {
+                const value = parseFloat(weight);
+                if (isNaN(value)) return "Weight must be a number";
+                if (value < 2.0) return "Weight must be at least 2.0 kg";
+                if (value > 300.0) return "Weight must be at most 300.0 kg";
+                return "";
+            }
+            
+            function validateHeight(height) {
+                const value = parseFloat(height);
+                if (isNaN(value)) return "Height must be a number";
+                if (value < 30.0) return "Height must be at least 30.0 cm";
+                if (value > 250.0) return "Height must be at most 250.0 cm";
+                return "";
+            }
+            
+            // Real-time validation
+            $("#temperature").on("input", function() {
+                const error = validateTemperature($(this).val());
+                $("#temperature-error").text(error);
+            });
+            
+            $("#pulseRate").on("input", function() {
+                const error = validatePulseRate($(this).val());
+                $("#pulseRate-error").text(error);
+            });
+            
+            $("#bloodPressure").on("input", function() {
+                const error = validateBloodPressure($(this).val());
+                $("#bloodPressure-error").text(error);
+            });
+            
+            $("#weight").on("input", function() {
+                const error = validateWeight($(this).val());
+                $("#weight-error").text(error);
+            });
+            
+            $("#height").on("input", function() {
+                const error = validateHeight($(this).val());
+                $("#height-error").text(error);
+            });
+            
+            // Form submission with validation
+            $("#triageForm").submit(function(event) {
+                event.preventDefault();
+                
+                // Validate all fields
+                const tempError = validateTemperature($("#temperature").val());
+                const pulseError = validatePulseRate($("#pulseRate").val());
+                const bpError = validateBloodPressure($("#bloodPressure").val());
+                const weightError = validateWeight($("#weight").val());
+                const heightError = validateHeight($("#height").val());
+                
+                // Show errors
+                $("#temperature-error").text(tempError);
+                $("#pulseRate-error").text(pulseError);
+                $("#bloodPressure-error").text(bpError);
+                $("#weight-error").text(weightError);
+                $("#height-error").text(heightError);
+                
+                // Check if there are any errors
+                if (tempError || pulseError || bpError || weightError || heightError) {
+                    return false; // Prevent form submission
+                }
+                
+                // If validation passes, submit form via AJAX
+                $.ajax({
+                    type: "POST",
+                    url: "/triage/saveTriage",
+                    data: $(this).serialize(),
+                    success: function() {
+                        alert("Patient Triage submitted successfully!");
+                        $("#content").load("/triage/pending");
+                    },
+                    error: function(xhr) {
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            // Display server-side validation errors
+                            $.each(xhr.responseJSON.errors, function(field, message) {
+                                $("#" + field + "-error").text(message);
+                            });
+                        } else {
+                            alert("Error submitting Triage Details!");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 20px;
+        }
+        .container {
+            background: white;
+            width: 50%;
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 10px 10px 0 0;
+        }
+        .header img {
+            height: 50px;
+        }
+        h2 {
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+        }
+        .input-group {
+            width: 80%;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        label {
+            font-weight: bold;
+            margin-top: 10px;
+            display: block;
+        }
+        input {
+            width: 100%;
+            padding: 8px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        input:invalid {
+            border-color: #ff6b6b;
+        }
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.85em;
+            display: block;
+            height: 20px;
+        }
+        .hint {
+            color: #6c757d;
+            font-size: 0.8em;
+            display: block;
+            margin-top: 2px;
+        }
+        button {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</div>

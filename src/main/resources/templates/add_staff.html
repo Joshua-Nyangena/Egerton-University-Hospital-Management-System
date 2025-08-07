@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Add Staff</title>
+</head>
+<body>
+    <h2>Add New Staff</h2>
+    
+    <form th:action="@{/admin/saveStaff}" method="post">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="nationalId">National ID:</label>
+        <input type="text" id="nationalId" name="nationalId" required><br>
+
+        <label for="contact">Contact (Phone Number):</label>
+        <input type="text" id="contact" name="contact" required><br>
+
+        <label for="role">Role:</label>
+        <select id="role" name="role">
+            <option value="ADMIN">Admin</option>
+            <option value="DOCTOR">Doctor</option>
+            <option value="RECEPTIONIST">Receptionist</option>
+            <option value="LAB_TECHNICIAN">Lab Technician</option>
+            <option value="PHARMACIST">Pharmacist</option>
+            <option value="TRIAGE_OFFICER">Triage Officer</option>
+        </select><br>
+
+        <button type="submit">Register Staff</button>
+    </form>
+
+    <p th:if="${success}" th:text="${success}" style="color: green;"></p>
+</body>
+</html>

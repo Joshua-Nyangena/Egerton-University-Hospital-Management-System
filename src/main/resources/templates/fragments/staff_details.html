@@ -1,0 +1,141 @@
+<div th:fragment="content" class="staff-container"> 
+    <!-- Header -->
+    <div class="logo-container">
+        <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+    </div>
+
+    <!-- Search Form -->
+    <form id="searchForm" method="get" th:action="@{/admin/searchStaff}" class="search-form">
+        <input type="text" name="keyword" placeholder="Search staff by Name, Work ID, or Role" th:value="${keyword}" class="input-field">
+        <button type="submit" class="btn primary-btn">Search</button>
+        <a href="/admin/staffList" id="clearButton" class="btn secondary-btn">Clear</a>
+    </form>
+
+    <!-- Add Staff Button -->
+    <a th:href="@{/admin/addStaff}" onclick="loadContent(this.href, event)" class="add-staff-btn">+ Add New Staff</a>
+
+    <!-- Staff List -->
+    <div id="staffContent">
+        <table class="staff-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Work ID</th>
+                    <th>Role</th> 
+                    <th>Contact</th>
+                    <th>Personal Email</th>
+                    <th>Work Email</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="staff : ${staffList}">
+                    <td th:text="${staff.name}"></td>
+                    <td th:text="${staff.workId}"></td>
+                    <td th:text="${staff.role}"></td>
+                    <td th:text="${staff.contact}"></td>
+                    <td th:text="${staff.personalEmail}"></td>
+                    <td th:text="${staff.workEmail}"></td>
+                    <td class="action-buttons">
+                        <a th:href="@{/admin/editStaff/{id}(id=${staff.id})}" class="btn edit-btn" onclick="loadContent(this.href, event)">Edit</a>
+                        <a th:href="@{/admin/deleteStaff/{id}(id=${staff.id})}" onclick="return confirm('Are you sure?')" class="btn delete-btn">Delete</a>
+                        <a th:href="@{/admin/resetStaff/{id}(id=${staff.id})}" onclick="return confirm('Reset staff details?')" class="btn reset-btn">Reset</a>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(staffList)}">
+                    <td colspan="7" class="no-data">No staff found</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <style>
+        .staff-container {
+            max-width: 1200px;
+            margin: auto;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            font-family: "Arial", sans-serif;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #004080;
+        }
+        .logo-holder {
+            font-size: 20px;
+            font-weight: bold;
+            color: #004080;
+        }
+        .search-form {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        .input-field {
+            flex-grow: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .btn {
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+        }
+        .primary-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        .secondary-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+        .add-staff-btn {
+            display: inline-block;
+            background-color: #004080;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-decoration: none;
+        }
+        .staff-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .staff-table th, .staff-table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        .staff-table th {
+            background-color: #004080;
+            color: white;
+        }
+        .staff-table tr:hover {
+            background-color: #eef3ff;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .edit-btn { background-color: #ffc107; color: black; }
+        .delete-btn { background-color: #dc3545; color: white; }
+        .reset-btn { background-color: #17a2b8; color: white; }
+        .no-data {
+            text-align: center;
+            color: #777;
+            padding: 20px;
+        }
+    </style>
+</div>

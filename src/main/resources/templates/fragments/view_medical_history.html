@@ -1,0 +1,87 @@
+<div th:fragment ="content">
+ <!-- Link to custom styles -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            width: 80%;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .no-history {
+            text-align: center;
+            font-size: 18px;
+            color: #888;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo-container">
+            <img th:src="@{/images/egertonuniversity-logo_thumb.png}" alt="Egerton University Logo">
+        </div>
+        <h2>Medical History</h2>
+        
+        <!-- If no medical history exists -->
+        <p class="no-history" th:if="${diagnoses.isEmpty()}">No medical history available for this patient.</p>
+
+        <!-- Medical history table -->
+        <table th:if="${!diagnoses.isEmpty()}">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Patient Name</th>
+                    <th>Lab Test</th>
+                    <th>Lab Result</th>
+                    <th>Prescription</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="diagnosis : ${diagnoses}">
+                    <td th:text="${#temporals.format(diagnosis.date, 'dd-MM-yyyy HH:mm')}"></td>
+                    <td th:text="${diagnosis.patientQueue.patient.name}"></td>
+                    
+                    <!-- Lab Test -->
+                    <td th:text="${diagnosis.labTest != null ? diagnosis.labTest : 'N/A'}"></td>
+                    
+                    <!-- Lab Result: Show 'N/A' if Lab Test is empty -->
+                    <td th:if="${diagnosis.labTest == null or diagnosis.labTest.trim().isEmpty()}" th:text="'N/A'"></td>
+                    <td th:unless="${diagnosis.labTest == null or diagnosis.labTest.trim().isEmpty()}" 
+                        th:text="${labResults.?[diagnosis.diagnosisId != null] != null ? labResults.?[diagnosis.diagnosisId != null].get(0).resultDetails : 'Pending'}">
+                    </td>
+                    
+                    <!-- Prescription -->
+                    <td th:text="${prescriptions.?[diagnosis.diagnosisId != null] != null ? prescriptions.?[diagnosis.diagnosisId != null].get(0).prescriptionDetails : 'Pending'}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
