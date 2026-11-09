@@ -39,27 +39,7 @@ Hospitals depend on accurate records and the right people seeing the right data.
 
 Requests with a missing, expired or invalid token are rejected.
 
-## Roles
 
-EDIT THIS SECTION to match your project. List each role and what it can do, for example:
-
-| Role | What this role can do |
-| --- | --- |
-| EDIT: role name | EDIT: for example, manage users and view all records |
-| EDIT: role name | EDIT: for example, view patients and manage appointments |
-| EDIT: role name | EDIT: for example, view their own appointments |
-
-## API overview
-
-EDIT THIS TABLE with your real endpoints. The method, path and purpose are enough.
-
-| Method | Endpoint | Purpose | Access |
-| --- | --- | --- | --- |
-| POST | EDIT: login path | Sign in and receive a JWT | Public |
-| GET | EDIT: patients path | List patients | EDIT: roles |
-| POST | EDIT: patients path | Register a patient | EDIT: roles |
-| GET | EDIT: appointments path | List appointments | EDIT: roles |
-| POST | EDIT: appointments path | Book an appointment | EDIT: roles |
 
 ## Project structure
 
@@ -103,7 +83,6 @@ Open `src/main/resources/application.properties` and set your own values for:
 * the database username and password
 * the JWT secret key
 
-Do not commit real passwords or secrets to GitHub. Keep them on your own machine.
 
 ### 4. Run the application
 
@@ -121,33 +100,10 @@ On Linux or macOS:
 
 The server starts on the port set in your configuration (Spring Boot uses 8080 by default).
 
-### 5. Try the API
+## 5. Try the API
 
 Use Postman or a similar tool. First call the login endpoint to get a token, then send that token in the `Authorization: Bearer <token>` header when calling protected endpoints.
 
-## Screenshots
-
-Add screenshots here once you have them. For example:
-
-* Login request and token response in Postman
-* A protected endpoint returning data with a valid token
-* The same endpoint returning an error without a token
-
-## What I learned
-
-* Building secure authentication with Spring Security and JWT
-* Designing role based access so each user only reaches what they should
-* Designing a relational schema and writing advanced SQL queries in MySQL
-* Structuring a Spring Boot project into clear layers
-* Designing and documenting REST APIs
-
-## Possible improvements
-
-* A billing module linked to patients and appointments
-* Automated tests for the services and security rules
-* Docker setup so the app and database start with one command
-* A web frontend for staff and patients
-* Deployment to a cloud host
 
 ## License
 
